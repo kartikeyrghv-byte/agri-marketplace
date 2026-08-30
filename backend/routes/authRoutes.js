@@ -8,7 +8,7 @@ const router = express.Router();
 // REGISTER
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, farmLocation, cropTypes, farmingMethod } = req.body;
 
     // check if user already exists
     const existingUser = await User.findOne({ email });
@@ -20,11 +20,14 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role
-    });
+  name,
+  email,
+  password: hashedPassword,
+  role,
+  farmLocation: farmLocation || '',
+  cropTypes: cropTypes || [],
+  farmingMethod: farmingMethod || ''
+});
 
     await newUser.save();
 
@@ -68,6 +71,19 @@ router.post('/login', async (req, res) => {
         role: user.role
       }
     });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// GET a farmer's public profile
+router.get('/farmer/:id', async (req, res) => {
+  try {
+    const farmer = await User.findById(req.params.id).select('-password');
+    if (!farmer || farmer.role !== 'farmer') {
+      return res.status(404).json({ message: 'Farmer not found' });
+    }
+    res.status(200).json(farmer);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

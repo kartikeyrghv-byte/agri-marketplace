@@ -27,6 +27,13 @@ app.use('/api/orders', orderRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/api/admin', adminRoutes);
 
+const reviewRoutes = require('./routes/reviewRoutes');
+app.use('/api/reviews', reviewRoutes);
+
+app.get('/test123', (req, res) => {
+  res.send('Test route working');
+});
+
 app.get("/", (req, res) => {
   res.send("Agri Marketplace API is running");
 });
@@ -50,3 +57,5 @@ connectDB().then(() => {
     console.log(`Server running on port ${PORT}`);
   });
 });
+ 
+ 

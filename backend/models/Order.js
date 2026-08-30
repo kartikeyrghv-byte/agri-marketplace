@@ -28,7 +28,12 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
-  }
+  },
+  deliverySlot: {
+  type: String,
+  enum: ['Morning (8AM-11AM)', 'Afternoon (12PM-3PM)', 'Evening (4PM-7PM)'],
+  default: 'Morning (8AM-11AM)'
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

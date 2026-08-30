@@ -7,6 +7,7 @@ import AddProduct from './pages/AddProduct';
 import MyOrders from './pages/MyOrders';
 import FarmerOrders from './pages/FarmerOrders';
 import AdminDashboard from './pages/AdminDashboard';
+import FarmerProfile from './pages/FarmerProfile';
 
 function Home() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/my-orders" element={<MyOrders />} />
         <Route path="/farmer-orders" element={<FarmerOrders />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/farmer/:id" element={<FarmerProfile />} />
       </Routes>
     </BrowserRouter>
   );

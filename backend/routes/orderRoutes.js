@@ -7,7 +7,7 @@ const router = express.Router();
 // PLACE an order
 router.post('/', async (req, res) => {
   try {
-    const { consumer, product, quantity } = req.body;
+    const { consumer, product, quantity, deliverySlot } = req.body;
 
     // find the product to get price and farmer
     const foundProduct = await Product.findById(product);
@@ -23,12 +23,13 @@ router.post('/', async (req, res) => {
     const totalPrice = foundProduct.price * quantity;
 
     const newOrder = new Order({
-      consumer,
-      product,
-      farmer: foundProduct.farmer,
-      quantity,
-      totalPrice
-    });
+  consumer,
+  product,
+  farmer: foundProduct.farmer,
+  quantity,
+  totalPrice,
+  deliverySlot: deliverySlot || 'Morning (8AM-11AM)'
+});
 
     await newOrder.save();
 
@@ -80,6 +81,27 @@ router.put('/:orderId/status', async (req, res) => {
     await order.save();
 
     res.status(200).json({ message: 'Order status updated', order });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// GET sales summary for a farmer
+router.get('/farmer/:farmerId/summary', async (req, res) => {
+  try {
+    const orders = await Order.find({ farmer: req.params.farmerId });
+
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    const deliveredOrders = orders.filter(o => o.status === 'delivered').length;
+    const pendingOrders = orders.filter(o => o.status === 'pending').length;
+
+    res.status(200).json({
+      totalOrders,
+      totalRevenue,
+      deliveredOrders,
+      pendingOrders
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -22,8 +22,21 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: function() {
-      return this.role !== 'farmer'; // farmers need approval, others auto-verified
+      return this.role !== 'farmer';
     }
+  },
+  farmLocation: {
+    type: String,
+    default: ''
+  },
+  cropTypes: {
+    type: [String],
+    default: []
+  },
+  farmingMethod: {
+    type: String,
+    enum: ['organic', 'conventional', ''],
+    default: ''
   }
 }, { timestamps: true });
 
