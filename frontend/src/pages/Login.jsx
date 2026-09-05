@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
 
 function Login() {
@@ -18,40 +18,58 @@ function Login() {
       const res = await API.post('/auth/login', formData);
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Login successful!');
       window.location.href = '/';
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong');
     }
   };
 
+  const inputClass = "w-full px-4 py-3 rounded-md border border-border bg-card text-brown placeholder:text-brown/40 focus:outline-none focus:border-olive transition-colors";
+
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <button type="submit" style={{ width: '100%', padding: '10px' }}>
-          Login
-        </button>
-      </form>
+    <div className="min-h-[75vh] flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <h2 className="font-serif text-3xl font-semibold text-brown mb-2 text-center">Welcome back</h2>
+        <p className="text-brown/60 text-center mb-8">Log in to your account</p>
+
+        {error && (
+          <p className="bg-terracotta/10 text-terracotta-dark text-sm px-4 py-2 rounded-md mb-4">{error}</p>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className={inputClass}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className={inputClass}
+          />
+          <button
+            type="submit"
+            className="bg-olive hover:bg-olive-dark text-cream py-3 rounded-md font-medium transition-colors mt-2"
+          >
+            Log In
+          </button>
+        </form>
+
+        <p className="text-brown/60 text-sm text-center mt-6">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-terracotta font-medium hover:underline">
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

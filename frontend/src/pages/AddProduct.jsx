@@ -45,78 +45,92 @@ function AddProduct() {
     }
   };
 
+  const inputClass = "w-full px-4 py-3 rounded-md border border-border bg-card text-brown placeholder:text-brown/40 focus:outline-none focus:border-olive transition-colors";
+
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h2>Add Product</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input
-          type="text"
-          name="category"
-          placeholder="Category (e.g. Vegetables)"
-          value={formData.category}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <input
-          type="number"
-          name="quantity"
-          placeholder="Quantity Available"
-          value={formData.quantity}
-          onChange={handleChange}
-          required
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <select
-          name="unit"
-          value={formData.unit}
-          onChange={handleChange}
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        >
-          <option value="kg">kg</option>
-          <option value="litre">litre</option>
-          <option value="piece">piece</option>
-          <option value="dozen">dozen</option>
-        </select>
-        <label style={{ display: 'block', marginBottom: '10px' }}>
+    <div className="min-h-[75vh] flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-sm">
+        <h2 className="font-serif text-3xl font-semibold text-brown mb-2 text-center">Add a Product</h2>
+        <p className="text-brown/60 text-center mb-8">List your produce for consumers to discover</p>
+
+        {error && (
+          <p className="bg-terracotta/10 text-terracotta-dark text-sm px-4 py-2 rounded-md mb-4">{error}</p>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
-            type="checkbox"
-            name="organic"
-            checked={formData.organic}
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={formData.name}
             onChange={handleChange}
-          />{' '}
-          Organic
-        </label>
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          style={{ display: 'block', width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <button type="submit" style={{ width: '100%', padding: '10px' }}>
-          Add Product
-        </button>
-      </form>
+            required
+            className={inputClass}
+          />
+          <input
+            type="text"
+            name="category"
+            placeholder="Category (e.g. Vegetables)"
+            value={formData.category}
+            onChange={handleChange}
+            required
+            className={inputClass}
+          />
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={formData.price}
+            onChange={handleChange}
+            required
+            className={inputClass}
+          />
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity Available"
+            value={formData.quantity}
+            onChange={handleChange}
+            required
+            className={inputClass}
+          />
+          <select
+            name="unit"
+            value={formData.unit}
+            onChange={handleChange}
+            className={inputClass}
+          >
+            <option value="kg">kg</option>
+            <option value="litre">litre</option>
+            <option value="piece">piece</option>
+            <option value="dozen">dozen</option>
+          </select>
+          <label className="flex items-center gap-2 text-brown text-sm">
+            <input
+              type="checkbox"
+              name="organic"
+              checked={formData.organic}
+              onChange={handleChange}
+              className="accent-olive"
+            />
+            Organic
+          </label>
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={formData.description}
+            onChange={handleChange}
+            rows="3"
+            className={inputClass}
+          />
+          <button
+            type="submit"
+            className="bg-olive hover:bg-olive-dark text-cream py-3 rounded-md font-medium transition-colors mt-2"
+          >
+            Add Product
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

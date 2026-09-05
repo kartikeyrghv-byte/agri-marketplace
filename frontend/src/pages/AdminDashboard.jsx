@@ -6,34 +6,34 @@ function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [categories, setCategories] = useState([]);
-const [newCategory, setNewCategory] = useState('');
-const [commission, setCommission] = useState(null);
-const [analytics, setAnalytics] = useState(null);
+  const [newCategory, setNewCategory] = useState('');
+  const [commission, setCommission] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('farmers');
 
   const fetchData = async () => {
-  try {
-    const [farmersRes, productsRes, ordersRes, categoriesRes, commissionRes, analyticsRes] = await Promise.all([
-      API.get('/admin/farmers'),
-      API.get('/admin/products'),
-      API.get('/admin/orders'),
-      API.get('/admin/categories'),
-      API.get('/admin/commission'),
-      API.get('/admin/analytics')
-    ]);
-    setFarmers(farmersRes.data);
-    setProducts(productsRes.data);
-    setOrders(ordersRes.data);
-    setCategories(categoriesRes.data);
-    setCommission(commissionRes.data);
-    setAnalytics(analyticsRes.data);
-  } catch (error) {
-    console.error('Error fetching admin data:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const [farmersRes, productsRes, ordersRes, categoriesRes, commissionRes, analyticsRes] = await Promise.all([
+        API.get('/admin/farmers'),
+        API.get('/admin/products'),
+        API.get('/admin/orders'),
+        API.get('/admin/categories'),
+        API.get('/admin/commission'),
+        API.get('/admin/analytics')
+      ]);
+      setFarmers(farmersRes.data);
+      setProducts(productsRes.data);
+      setOrders(ordersRes.data);
+      setCategories(categoriesRes.data);
+      setCommission(commissionRes.data);
+      setAnalytics(analyticsRes.data);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -59,196 +59,219 @@ const [analytics, setAnalytics] = useState(null);
   };
 
   const handleAddCategory = async () => {
-  if (!newCategory.trim()) return;
-  try {
-    await API.post('/admin/categories', { name: newCategory });
-    setNewCategory('');
-    fetchData();
-  } catch {
-    alert('Failed to add category');
-  }
-};
+    if (!newCategory.trim()) return;
+    try {
+      await API.post('/admin/categories', { name: newCategory });
+      setNewCategory('');
+      fetchData();
+    } catch {
+      alert('Failed to add category');
+    }
+  };
 
-const handleDeleteCategory = async (categoryId) => {
-  try {
-    await API.delete(`/admin/categories/${categoryId}`);
-    fetchData();
-  } catch {
-    alert('Failed to delete category');
-  }
-};
+  const handleDeleteCategory = async (categoryId) => {
+    try {
+      await API.delete(`/admin/categories/${categoryId}`);
+      fetchData();
+    } catch {
+      alert('Failed to delete category');
+    }
+  };
 
-  if (loading) return <p style={{ textAlign: 'center' }}>Loading admin data...</p>;
+  const tabs = [
+    { key: 'farmers', label: `Farmers (${farmers.length})` },
+    { key: 'products', label: `Products (${products.length})` },
+    { key: 'orders', label: `Orders (${orders.length})` },
+    { key: 'categories', label: `Categories (${categories.length})` },
+    { key: 'commission', label: 'Commission' },
+    { key: 'analytics', label: 'Analytics' }
+  ];
+
+  const statCard = (value, label) => (
+    <div className="bg-card border border-border rounded-lg p-4 text-center flex-1 min-w-[140px]">
+      <p className="text-xl font-serif font-semibold text-brown">{value}</p>
+      <p className="text-brown/60 text-sm">{label}</p>
+    </div>
+  );
+
+  if (loading) return <p className="text-brown/60 text-center py-16">Loading admin data...</p>;
 
   return (
-    <div style={{ maxWidth: '900px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h2>Admin Dashboard</h2>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      <h2 className="font-serif text-4xl font-semibold text-brown mb-8">Admin Dashboard</h2>
 
-      <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-        <button onClick={() => setActiveTab('farmers')}>Farmers ({farmers.length})</button>
-        <button onClick={() => setActiveTab('products')}>Products ({products.length})</button>
-        <button onClick={() => setActiveTab('orders')}>Orders ({orders.length})</button>
-        <button onClick={() => setActiveTab('categories')}>Categories ({categories.length})</button>
-        <button onClick={() => setActiveTab('commission')}>Commission</button>
-        <button onClick={() => setActiveTab('analytics')}>Analytics</button>
+      <div className="flex flex-wrap gap-2 mb-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === tab.key
+                ? 'bg-olive text-cream'
+                : 'bg-card border border-border text-brown hover:border-olive/40'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {activeTab === 'farmers' && (
         <div>
-          <h3>Farmer Registrations</h3>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">Farmer Registrations</h3>
           {farmers.length === 0 ? (
-            <p>No farmers registered yet.</p>
+            <p className="text-brown/60">No farmers registered yet.</p>
           ) : (
-            farmers.map((farmer) => (
-              <div key={farmer._id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
-                <p><strong>Name:</strong> {farmer.name}</p>
-                <p><strong>Email:</strong> {farmer.email}</p>
-                <p><strong>Status:</strong> {farmer.isVerified ? '✅ Verified' : '⏳ Pending Approval'}</p>
-                {!farmer.isVerified && (
-                  <button onClick={() => handleApprove(farmer._id)}>Approve</button>
-                )}
-              </div>
-            ))
+            <div className="flex flex-col gap-3">
+              {farmers.map((farmer) => (
+                <div key={farmer._id} className="bg-card border border-border rounded-lg p-4 flex justify-between items-center flex-wrap gap-3">
+                  <div>
+                    <p className="font-medium text-brown">{farmer.name}</p>
+                    <p className="text-brown/60 text-sm">{farmer.email}</p>
+                    <span className={`inline-block mt-1 text-xs px-2 py-1 rounded-full font-medium ${farmer.isVerified ? 'bg-olive/10 text-olive-dark' : 'bg-terracotta/10 text-terracotta-dark'}`}>
+                      {farmer.isVerified ? 'Verified' : 'Pending Approval'}
+                    </span>
+                  </div>
+                  {!farmer.isVerified && (
+                    <button
+                      onClick={() => handleApprove(farmer._id)}
+                      className="bg-olive hover:bg-olive-dark text-cream px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Approve
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
 
       {activeTab === 'products' && (
         <div>
-          <h3>All Products</h3>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">All Products</h3>
           {products.length === 0 ? (
-            <p>No products listed yet.</p>
+            <p className="text-brown/60">No products listed yet.</p>
           ) : (
-            products.map((product) => (
-              <div key={product._id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
-                <p><strong>Name:</strong> {product.name}</p>
-                <p><strong>Category:</strong> {product.category}</p>
-                <p><strong>Price:</strong> ₹{product.price} / {product.unit}</p>
-                <p><strong>Farmer:</strong> {product.farmer?.name}</p>
-                <button onClick={() => handleDeleteProduct(product._id)} style={{ color: 'red' }}>
-                  Delete
-                </button>
-              </div>
-            ))
+            <div className="flex flex-col gap-3">
+              {products.map((product) => (
+                <div key={product._id} className="bg-card border border-border rounded-lg p-4 flex justify-between items-center flex-wrap gap-3">
+                  <div>
+                    <p className="font-medium text-brown">{product.name}</p>
+                    <p className="text-brown/60 text-sm">{product.category} · ₹{product.price} / {product.unit} · by {product.farmer?.name}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteProduct(product._id)}
+                    className="text-terracotta hover:text-terracotta-dark text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
 
       {activeTab === 'orders' && (
         <div>
-          <h3>All Orders</h3>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">All Orders</h3>
           {orders.length === 0 ? (
-            <p>No orders placed yet.</p>
+            <p className="text-brown/60">No orders placed yet.</p>
           ) : (
-            orders.map((order) => (
-              <div key={order._id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
-                <p><strong>Product:</strong> {order.product?.name}</p>
-                <p><strong>Consumer:</strong> {order.consumer?.name}</p>
-                <p><strong>Farmer:</strong> {order.farmer?.name}</p>
-                <p><strong>Total:</strong> ₹{order.totalPrice}</p>
-                <p><strong>Status:</strong> {order.status}</p>
-              </div>
-            ))
+            <div className="flex flex-col gap-3">
+              {orders.map((order) => (
+                <div key={order._id} className="bg-card border border-border rounded-lg p-4">
+                  <p className="font-medium text-brown">{order.product?.name}</p>
+                  <p className="text-brown/60 text-sm">{order.consumer?.name} → {order.farmer?.name} · ₹{order.totalPrice} · {order.status}</p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
 
       {activeTab === 'categories' && (
-  <div>
-    <h3>Manage Categories</h3>
-    <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-      <input
-        type="text"
-        placeholder="New category name"
-        value={newCategory}
-        onChange={(e) => setNewCategory(e.target.value)}
-        style={{ padding: '8px', flex: '1' }}
-      />
-      <button onClick={handleAddCategory}>Add</button>
-    </div>
-    {categories.length === 0 ? (
-      <p>No categories yet.</p>
-    ) : (
-      categories.map((cat) => (
-        <div key={cat._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #ccc', borderRadius: '8px', padding: '10px', marginBottom: '8px' }}>
-          <span>{cat.name}</span>
-          <button onClick={() => handleDeleteCategory(cat._id)} style={{ color: 'red' }}>Delete</button>
+        <div>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">Manage Categories</h3>
+          <div className="flex gap-3 mb-6">
+            <input
+              type="text"
+              placeholder="New category name"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="flex-1 px-4 py-2.5 rounded-md border border-border bg-card text-brown placeholder:text-brown/40 focus:outline-none focus:border-olive"
+            />
+            <button
+              onClick={handleAddCategory}
+              className="bg-olive hover:bg-olive-dark text-cream px-5 py-2.5 rounded-md text-sm font-medium transition-colors"
+            >
+              Add
+            </button>
+          </div>
+          {categories.length === 0 ? (
+            <p className="text-brown/60">No categories yet.</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {categories.map((cat) => (
+                <div key={cat._id} className="bg-card border border-border rounded-lg p-3 flex justify-between items-center">
+                  <span className="text-brown">{cat.name}</span>
+                  <button
+                    onClick={() => handleDeleteCategory(cat._id)}
+                    className="text-terracotta hover:text-terracotta-dark text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))
-    )}
-  </div>
-)}
+      )}
 
-{activeTab === 'commission' && commission && (
-  <div>
-    <h3>Platform Commission Summary</h3>
-    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '150px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{commission.totalOrders}</p>
-        <p>Total Orders</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '150px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>₹{commission.totalSales}</p>
-        <p>Total Sales</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '150px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>₹{commission.totalCommission}</p>
-        <p>Platform Commission ({commission.commissionRate}%)</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '150px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>₹{commission.farmerEarnings}</p>
-        <p>Farmer Earnings</p>
-      </div>
-    </div>
-  </div>
-)}
+      {activeTab === 'commission' && commission && (
+        <div>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">Platform Commission Summary</h3>
+          <div className="flex flex-wrap gap-3">
+            {statCard(commission.totalOrders, 'Total Orders')}
+            {statCard(`₹${commission.totalSales}`, 'Total Sales')}
+            {statCard(`₹${commission.totalCommission}`, `Platform Commission (${commission.commissionRate}%)`)}
+            {statCard(`₹${commission.farmerEarnings}`, 'Farmer Earnings')}
+          </div>
+        </div>
+      )}
 
-{activeTab === 'analytics' && analytics && (
-  <div>
-    <h3>Platform Analytics</h3>
-    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.totalFarmers}</p>
-        <p>Total Farmers</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.verifiedFarmers}</p>
-        <p>Verified Farmers</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.totalConsumers}</p>
-        <p>Total Consumers</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.totalProducts}</p>
-        <p>Total Products</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.organicProducts}</p>
-        <p>Organic Products</p>
-      </div>
-      <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '12px', flex: '1', minWidth: '140px', textAlign: 'center' }}>
-        <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{analytics.totalOrders}</p>
-        <p>Total Orders</p>
-      </div>
-    </div>
+      {activeTab === 'analytics' && analytics && (
+        <div>
+          <h3 className="font-serif text-2xl font-semibold text-brown mb-4">Platform Analytics</h3>
+          <div className="flex flex-wrap gap-3 mb-8">
+            {statCard(analytics.totalFarmers, 'Total Farmers')}
+            {statCard(analytics.verifiedFarmers, 'Verified Farmers')}
+            {statCard(analytics.totalConsumers, 'Total Consumers')}
+            {statCard(analytics.totalProducts, 'Total Products')}
+            {statCard(analytics.organicProducts, 'Organic Products')}
+            {statCard(analytics.totalOrders, 'Total Orders')}
+          </div>
 
-    <h4>Order Status Breakdown</h4>
-    {analytics.statusCounts.map((s) => (
-      <p key={s._id}>{s._id}: {s.count}</p>
-    ))}
+          <h4 className="font-serif text-lg font-semibold text-brown mb-2">Order Status Breakdown</h4>
+          <div className="flex flex-col gap-1 mb-8">
+            {analytics.statusCounts.map((s) => (
+              <p key={s._id} className="text-brown/70 text-sm capitalize">{s._id}: <span className="font-medium text-brown">{s.count}</span></p>
+            ))}
+          </div>
 
-    <h4 style={{ marginTop: '20px' }}>Top Ordered Products</h4>
-    {analytics.topProducts.length === 0 ? (
-      <p>No orders yet.</p>
-    ) : (
-      analytics.topProducts.map((p, index) => (
-        <p key={index}>{p.name}: {p.totalOrdered} units ordered</p>
-      ))
-    )}
-  </div>
-)}
-
+          <h4 className="font-serif text-lg font-semibold text-brown mb-2">Top Ordered Products</h4>
+          {analytics.topProducts.length === 0 ? (
+            <p className="text-brown/60">No orders yet.</p>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {analytics.topProducts.map((p, index) => (
+                <p key={index} className="text-brown/70 text-sm">{p.name}: <span className="font-medium text-brown">{p.totalOrdered} units ordered</span></p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

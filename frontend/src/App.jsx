@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -11,9 +11,29 @@ import FarmerProfile from './pages/FarmerProfile';
 
 function Home() {
   return (
-    <div style={{ textAlign: 'center', marginTop: '80px', fontFamily: 'sans-serif' }}>
-      <h1>Farmer to Consumer Agri Marketplace</h1>
-      <p>Connecting farmers directly with consumers.</p>
+    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-6">
+      <p className="text-terracotta font-medium text-sm mb-4 tracking-wide">Fresh from the source</p>
+      <h1 className="font-serif text-5xl md:text-6xl font-semibold text-brown max-w-3xl leading-tight">
+        Farmer to Consumer Agri Marketplace
+      </h1>
+      <p className="text-brown/70 text-lg mt-6 max-w-xl">
+        Buy fresh, honestly-priced produce straight from the farmers who grow it — no middlemen, no markup.
+      </p>
+      <div className="flex gap-4 mt-10">
+  <Link
+    to="/products"
+    className="bg-olive hover:bg-olive-dark text-cream px-6 py-3 rounded-md font-medium transition-colors"
+  >
+    Browse Products
+  </Link>
+
+  <Link
+    to="/register"
+    className="border border-brown/20 hover:border-brown/40 text-brown px-6 py-3 rounded-md font-medium transition-colors"
+  >
+    Join as a Farmer
+  </Link>
+</div>
     </div>
   );
 }
